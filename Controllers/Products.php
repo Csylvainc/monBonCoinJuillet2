@@ -61,4 +61,65 @@ class Products extends Controller{
             'categories' => $categories
         ]);
     }
+
+    // Méthode pour ajouter un produit
+    public static function ajoutProduct(){
+        $errMsg = "";
+        // Traitement du formulaire
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (empty($_POST['idCategorie'])) {
+                $errMsg .= "Merci de choisir une catégorie<br>";
+            }
+            if (empty($_POST['title'])) {
+                $errMsg .= "Merci de saisir un titre<br>";
+            }
+            if (empty($_POST['price'])) {
+                $errMsg .= "Merci de saisir un prix<br>";
+            }
+            if (empty($_POST['description'])) {
+                $errMsg .= "Merci de saisir une description<br>";
+            }
+            if(empty($_FILES['image']['name'])){
+                $errMsg .= "Merci de choisir l'image de votre produit";
+            }
+            // Les controles sur l'image
+            if ($_FILES['image']['size'] < 3000000 &&
+                ($_FILES['image']['type'] == 'image/jpeg' ||
+                $_FILES['image']['type'] == 'image/jpg' ||
+                $_FILES['image']['type'] == 'image/png' ||
+                $_FILES['image']['type'] == 'image/webp')) {
+                // On sécurise les saisies
+                self::security();
+                // On renommer l'image pour avoir un nom unique
+                $photoName = uniqid() . $_FILES['image']['name'];
+                // echo $photoName;
+                // echo __DIR__;
+                // on copie l'image sur le serveur
+                copy($_FILES['image']['tmp_name'], "../public/image/" . $photoName);
+                // On peut maintenant enregistrer en BDD
+                // je stocke les infos dans un tableau
+                $dataProduct = [
+                    $_POST['idCategorie'],
+                    $_SESSION['user']['id'],
+                    $_POST['title'],
+                    $_POST['description'],
+                    $_POST['price'],
+                    $photoName
+                ];
+                // On utilise la bonne méthode
+                \Models\Products::create($dataProduct);
+            }else{
+                $errMsg = "Votre image n'est pas au format demandé";
+            }
+
+        }
+        // Je récupère toutes les catégories
+        $categories = \Models\Categories::findAll();
+        // j'appelle la bonne vue
+        self::render('products/formProduct',[
+            'title' => 'Formulaire de création d\'un produit',
+            'categories' => $categories,
+            'errMsg' => $errMsg
+        ]);
+    }
 }

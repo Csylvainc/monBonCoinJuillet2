@@ -47,7 +47,12 @@ class Products extends Db{
 
     // les produits d'une catégories
     public static function findByCat($idCategory, $order = null){
-        $request = "SELECT *, products.title AS productTitle, categories.title AS catTitle FROM products INNER JOIN categories ON products.idCategory = categories.idCategory WHERE products.idCategory = :idCategory";
+        $request = 
+        "SELECT *, products.title AS productTitle, categories.title AS catTitle 
+        FROM products 
+        INNER JOIN categories 
+        ON products.idCategory = categories.idCategory 
+        WHERE products.idCategory = :idCategory";
         // Attention le champs idCategory est présent dans les deux tables donc il faut préciser le nom de la table dans le WHERE
         $order ? $request.= " ORDER BY $order" : null;
         $response = self::getDb()->prepare($request);
