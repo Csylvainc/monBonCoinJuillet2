@@ -29,6 +29,7 @@ class Users extends Controller
                         'id' => $user['idUser'],
                         'firstName' => $user['firstName']
                     ];
+                    session_write_close();
                     // Quand l'utilisateur est connecté on le redirige ver la route de notre choix
                     header('Location: /');
                 } else {
@@ -97,7 +98,7 @@ class Users extends Controller
                 // On enregistre en BDD
                 \Models\Users::create($dataUser);
                 $_SESSION['message'] = "Votre compte est crée, vous pouvez vous connecter";
-                var_dump($_SESSION);
+                session_write_close();
                 header('Location: /connexion');
             } else {
                 $errMsg = "Les deux mots de passe sont diférents ou ne contiennent pas 8 caractères";
