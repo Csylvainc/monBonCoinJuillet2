@@ -122,4 +122,31 @@ class Products extends Controller{
             'errMsg' => $errMsg
         ]);
     }
+
+    // Méthode pour modifier un produit
+    public static function modifProduct(){
+        $errMsg = "";
+        // Je récupère toutes les catégories
+        $categories = \Models\Categories::findAll();
+
+        // Je fais appelle au models Products pour récupérer le produit à modifier
+        $idProduct = $_GET['id'];
+        $product = \Models\Products::findById($idProduct);
+        // j'appelle la bonne vue si je suis connecté
+        if(isset($_SESSION['user']) &&
+         ($_SESSION['user']['role'] == 1 ||
+          $_SESSION['user']['id'] == $product['idUser'])){
+            self::render('products/formProduct',[
+                'title' => 'Formulaire de modification d\'un produit',
+                'categories' => $categories,
+                'errMsg' => $errMsg,
+                'product' => $product
+            ]);
+        }else{
+            self::render('users/connexion',[
+                'title' => 'Merci de vous connecter pour modifier un produit',
+                'messageErreur' => $errMsg
+            ]);
+        }
+    }
 }
